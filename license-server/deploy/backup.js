@@ -1,0 +1,17 @@
+const { DatabaseSync } = require('node:sqlite');
+const fs = require('fs');
+const path = require('path');
+const SRC = '/opt/qc-license/data/license.db';
+const DIR = '/opt/qc-license/data/backups';
+fs.mkdirSync(DIR, { recursive: true });
+const stamp = new Date().toISOString().replace(/[:T]/g, '-').slice(0, 19);
+const out = path.join(DIR, 'license-' + stamp + '.db');
+const db = new DatabaseSync(SRC);
+db.exec("VACUUM INTO '" + out.replace(/'/g, "''") + "'");
+db.close();
+const chk = new DatabaseSync(out, { readonly: true });
+const cards = chk.prepare('SELECT COUNT(*) c FROM cards').get().c;
+const devs = chk.prepare('SELECT COUNT(*) c FROM devices').get().c;
+chk.close();
+const size = fs.statSync(out).size;
+console.log(JSON.stringify({ snapshot: out, size, cards, devices: devs }));

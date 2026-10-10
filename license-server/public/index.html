@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>qc-license · 卡密授权后台</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2430; --line:#26303d;
+    --ink:#e6edf3; --ink2:#8b949e; --brand:#4f7cf7; --brand2:#22c3e6;
+    --ok:#3fb950; --warn:#d29922; --bad:#f85149; --gray:#6e7681;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+  .wrap{max-width:1240px;margin:0 auto;padding:22px 20px 60px}
+  header{display:flex;align-items:center;gap:14px;padding:6px 0 18px}
+  .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-weight:700;color:#fff}
+  h1{font-size:19px;font-weight:700;letter-spacing:.3px}
+  .sub{color:var(--ink2);font-size:12px}
+  .grow{flex:1}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stat b{display:block;font-size:24px;line-height:1.3}
+  .stat span{color:var(--ink2);font-size:12px}
+  .tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+  .tab{padding:9px 16px;cursor:pointer;color:var(--ink2);border-bottom:2px solid transparent;font-weight:600;font-size:13px}
+  .tab.on{color:var(--ink);border-color:var(--brand)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  .card h2{font-size:14px;margin-bottom:14px;color:var(--ink)}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .fld{display:flex;flex-direction:column;gap:6px}
+  .fld label{font-size:12px;color:var(--ink2)}
+  input,select,textarea{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font:13px/1.4 inherit;outline:none;min-width:0}
+  input:focus,select:focus,textarea:focus{border-color:var(--brand)}
+  button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 14px;font:600 13px/1.4 inherit;cursor:pointer}
+  button:hover{border-color:var(--brand)}
+  button.primary{background:linear-gradient(135deg,var(--brand),var(--brand2));border:none;color:#fff}
+  button.ghost{background:transparent}
+  button.mini{padding:3px 8px;font-size:12px;font-weight:500}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .preset{padding:8px 12px;border:1px solid var(--line);border-radius:99px;font-size:12px;cursor:pointer;color:var(--ink2)}
+  .preset.on{border-color:var(--brand);color:var(--ink);background:rgba(79,124,247,.12)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{color:var(--ink2);font-size:12px;font-weight:600}
+  td.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.4px}
+  .tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;border:1px solid}
+  .t-unused{color:var(--brand);border-color:rgba(79,124,247,.4);background:rgba(79,124,247,.1)}
+  .t-activated{color:var(--ok);border-color:rgba(63,185,80,.4);background:rgba(63,185,80,.1)}
+  .t-expired{color:var(--warn);border-color:rgba(210,153,34,.4);background:rgba(210,153,34,.1)}
+  .t-revoked{color:var(--bad);border-color:rgba(248,81,73,.4);background:rgba(248,81,73,.1)}
+  button.mini.danger{color:var(--bad);border-color:rgba(248,81,73,.45)}
+  button.mini.danger:hover{background:rgba(248,81,73,.12)}
+  .muted{color:var(--ink2)}
+  .result{margin-top:14px;background:var(--panel2);border:1px dashed var(--line);border-radius:10px;padding:14px}
+  .codes{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:10px;max-height:260px;overflow:auto}
+  .codes div{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:#0d1117;border:1px solid var(--line);border-radius:6px;padding:6px 8px;cursor:pointer}
+  .codes div:hover{border-color:var(--brand)}
+  .pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px;font-size:12px;color:var(--ink2)}
+  .overlay{position:fixed;inset:0;background:rgba(5,8,12,.86);display:grid;place-items:center;z-index:50}
+  .login{width:340px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .login h2{margin-bottom:6px}
+  .login p{color:var(--ink2);font-size:12px;margin-bottom:16px}
+  .login input{width:100%;margin-bottom:12px}
+  .login button{width:100%}
+  .toast{position:fixed;right:22px;bottom:22px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:10px;padding:12px 16px;font-size:13px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;max-width:380px}
+  .toast.on{opacity:1;transform:none}
+  .toast.err{border-left-color:var(--bad)}
+  .hide{display:none!important}
+  code.hint{background:#0d1117;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="overlay" id="loginBox">
+  <div class="login">
+    <h2>卡密授权后台</h2>
+    <p>qc-license · 商家端</p>
+    <input id="pw" type="password" placeholder="管理口令" autocomplete="current-password">
+    <button class="primary" id="loginBtn">登录</button>
+  </div>
+</div>
+
+<div class="wrap hide" id="app">
+  <header>
+    <div class="logo">QC</div>
+    <div>
+      <h1>卡密授权后台</h1>
+      <div class="sub">qc-license · 卡密生成 / 激活授权 / 设备管理</div>
+    </div>
+    <div class="grow"></div>
+    <button class="ghost" id="refreshBtn">刷新数据</button>
+    <button class="ghost" id="logoutBtn">退出</button>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="tabs">
+    <div class="tab on" data-tab="make">卡密制作</div>
+    <div class="tab" data-tab="manage">卡密管理</div>
+    <div class="tab" data-tab="devices">设备管理</div>
+  </div>
+
+  <section id="tab-make">
+    <div class="card">
+      <h2>① 选择套餐</h2>
+      <div class="presets" id="presets"></div>
+      <div class="row">
+        <div class="fld"><label>套餐名称</label><input id="pName" value="月度版" style="width:160px"></div>
+        <div class="fld"><label>有效天数（0 = 永久）</label><input id="pDays" type="number" value="30" min="0" style="width:120px"></div>
+        <div class="fld"><label>可用次数（0 = 不限）</label><input id="pUses" type="number" value="0" min="0" style="width:120px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>② 生成卡密</h2>
+      <div class="row">
+        <div class="fld"><label>生成数量（≤1000）</label><input id="gCount" type="number" value="10" min="1" max="1000" style="width:120px"></div>
+        <div class="fld"><label>批次号（留空自动）</label><input id="gBatch" placeholder="自动生成" style="width:200px"></div>
+        <div class="fld"><label>备注</label><input id="gNote" placeholder="例如：淘宝订单 / 线下" style="width:220px"></div>
+        <div class="fld"><button class="primary" id="genBtn">生成卡密</button></div>
+      </div>
+      <div class="result hide" id="genResult"></div>
+    </div>
+  </section>
+
+  <section id="tab-manage" class="hide">
+    <div class="card">
+      <h2>卡密列表</h2>
+      <div class="row" style="margin-bottom:12px">
+        <div class="fld"><label>状态</label><select id="fStatus">
+          <option value="">全部</option><option value="unused">未使用</option>
+          <option value="activated">已激活</option><option value="expired">已到期</option><option value="revoked">已吊销</option>
+        </select></div>
+        <div class="fld"><label>批次</label><select id="fBatch"><option value="">全部</option></select></div>
+        <div class="fld"><label>搜索</label><input id="fQ" placeholder="卡密 / 备注 / 设备号" style="width:220px"></div>
+        <div class="fld"><button id="fBtn">查询</button></div>
+        <div class="fld"><button id="expBtn">导出 CSV</button></div>
+      </div>
+      <div style="overflow:auto"><table id="cardTable"></table></div>
+      <div class="pager">
+        <span id="pageInfo"></span>
+        <button class="mini" id="prevPage">上一页</button>
+        <button class="mini" id="nextPage">下一页</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-devices" class="hide">
+    <div class="card">
+      <h2>已绑定设备</h2>
+      <div style="overflow:auto"><table id="devTable"></table></div>
+      <div class="pager">
+        <span id="devPageInfo"></span>
+        <button class="mini" id="devPrev">上一页</button>
+        <button class="mini" id="devNext">下一页</button>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const PRESETS = [
+  {name:'体验版（7天/50次）', days:7,  uses:50},
+  {name:'月度版（30天/不限）', days:30, uses:0},
+  {name:'季度版（90天/不限）', days:90, uses:0},
+  {name:'年度版（365天/不限）', days:365,uses:0},
+  {name:'永久版（不限时不限次）', days:0, uses:0},
+];
+let TOKEN = localStorage.getItem('qc_token') || '';
+let page = 1, devPage = 1;
+const $ = (s) => document.querySelector(s);
+const el = (t, c, x) => { const n = document.createElement(t); if (c) n.className = c; if (x !== undefined) n.textContent = x; return n; };
+const fmt = (t) => t ? new Date(t * 1000).toLocaleString('zh-CN', {hour12:false}) : '—';
+
+function toast(msg, isErr) {
+  const t = $('#toast'); t.textContent = msg; t.className = 'toast on' + (isErr ? ' err' : '');
+  clearTimeout(t._h); t._h = setTimeout(() => t.className = 'toast', 2600);
+}
+async function api(path, opts = {}) {
+  const r = await fetch(path, {
+    ...opts,
+    headers: {'Content-Type':'application/json', ...(TOKEN ? {Authorization:'Bearer ' + TOKEN} : {}), ...(opts.headers||{})}
+  });
+  if (r.status === 401 && !path.endsWith('/login')) { TOKEN=''; localStorage.removeItem('qc_token'); $('#loginBox').classList.remove('hide'); throw new Error('登录已过期'); }
+  const ct = r.headers.get('content-type') || '';
+  if (!ct.includes('json')) return await r.blob();
+  const j = await r.json();
+  if (!r.ok || j.ok === false) throw new Error(j.message || ('HTTP ' + r.status));
+  return j;
+}
+
+/* ---- 登录 ---- */
+async function login() {
+  const pw = $('#pw').value;
+  if (!pw) return toast('请输入口令', true);
+  try {
+    const j = await api('/api/admin/login', {method:'POST', body: JSON.stringify({password: pw})});
+    TOKEN = j.token; localStorage.setItem('qc_token', TOKEN);
+    $('#loginBox').classList.add('hide'); $('#app').classList.remove('hide');
+    boot();
+  } catch (e) { toast(e.message, true); }
+}
+$('#loginBtn').onclick = login;
+$('#pw').addEventListener('keydown', (e) => e.key === 'Enter' && login());
+$('#logoutBtn').onclick = () => { TOKEN=''; localStorage.removeItem('qc_token'); location.reload(); };
+$('#refreshBtn').onclick = () => { loadStats(); if (!$('#tab-manage').classList.contains('hide')) loadCards(); if (!$('#tab-devices').classList.contains('hide')) loadDevices(); };
+
+/* ---- 套餐 ---- */
+PRESETS.forEach((p, i) => {
+  const b = el('div', 'preset', p.name); b.dataset.i = i;
+  b.onclick = () => {
+    document.querySelectorAll('.preset').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    $('#pName').value = p.name.split('（')[0];
+    $('#pDays').value = p.days; $('#pUses').value = p.uses;
+  };
+  $('#presets').appendChild(b);
+});
+document.querySelector('.preset').classList.add('on');
+
+/* ---- 生成 ---- */
+$('#genBtn').onclick = async () => {
+  const body = {
+    plan: {name: $('#pName').value || '自定义套餐', days: +$('#pDays').value || 0, uses: +$('#pUses').value || 0},
+    count: +$('#gCount').value || 1, batch: $('#gBatch').value.trim(), note: $('#gNote').value.trim()
+  };
+  $('#genBtn').disabled = true;
+  try {
+    const j = await api('/api/admin/cards/generate', {method:'POST', body: JSON.stringify(body)});
+    renderResult(j); toast('已生成 ' + j.count + ' 张卡密（批次 ' + j.batch + '）');
+    loadStats(); loadBatchOptions();
+  } catch (e) { toast(e.message, true); }
+  $('#genBtn').disabled = false;
+};
+function renderResult(j) {
+  const box = $('#genResult'); box.classList.remove('hide'); box.innerHTML = '';
+  const head = el('div', 'row');
+  head.appendChild(el('div', 'muted', '批次：' + j.batch + ' · 数量：' + j.count + ' · 套餐：' + j.plan.name + '（' + (j.plan.days ? j.plan.days + '天' : '永久') + ' / ' + (j.plan.uses ? j.plan.uses + '次' : '不限次') + '）'));
+  const sp = el('div', 'grow');
+  const copyAll = el('button', 'mini', '复制全部');
+  copyAll.onclick = () => { navigator.clipboard.writeText(j.codes.join('\n')); toast('已复制 ' + j.codes.length + ' 张'); };
+  const csv = el('button', 'mini', '导出本批 CSV');
+  csv.onclick = () => download('/api/admin/export?batch=' + encodeURIComponent(j.batch), j.batch + '.csv');
+  head.appendChild(sp); head.appendChild(copyAll); head.appendChild(csv);
+  box.appendChild(head);
+  const list = el('div', 'codes');
+  j.codes.forEach(c => {
+    const d = el('div', '', c);
+    d.title = '点击复制';
+    d.onclick = () => { navigator.clipboard.writeText(c); toast('已复制 ' + c); };
+    list.appendChild(d);
+  });
+  box.appendChild(list);
+}
+async function download(url, name) {
+  const blob = await api(url);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  URL.revokeObjectURL(a.href); toast('已导出 ' + name);
+}
+
+/* ---- 统计 ---- */
+async function loadStats() {
+  try {
+    const s = await api('/api/admin/stats');
+    const items = [
+      ['卡密总数', s.total], ['未使用', s.unused], ['已激活', s.activated],
+      ['已到期', s.expired], ['已吊销', s.revoked], ['绑定设备', s.devices],
+      ['24h 在线设备', s.online_24h], ['今日激活', s.today_activated],
+    ];
+    $('#stats').innerHTML = '';
+    items.forEach(([k, v]) => {
+      const d = el('div', 'stat');
+      d.appendChild(el('b', '', String(v))); d.appendChild(el('span', '', k));
+      $('#stats').appendChild(d);
+    });
+  } catch (e) { toast(e.message, true); }
+}
+
+/* ---- 卡密管理 ---- */
+const TAG = {unused:'未使用', activated:'已激活', expired:'已到期', revoked:'已吊销'};
+async function loadCards() {
+  const p = new URLSearchParams({status: $('#fStatus').value, batch: $('#fBatch').value, q: $('#fQ').value.trim(), page, size: 20});
+  try {
+    const j = await api('/api/admin/cards?' + p);
+    const t = $('#cardTable'); t.innerHTML = '';
+    t.appendChild(el('tr')).innerHTML = ['卡密','备注','套餐','时长','状态','绑定设备','激活时间','到期时间','已用次数','操作'].map(h => '<th>' + h + '</th>').join('');
+    if (!j.items.length) { const r = t.insertRow(); const c = r.insertCell(); c.colSpan = 10; c.className = 'muted'; c.textContent = '暂无数据'; }
+    j.items.forEach((c) => {
+      const r = t.insertRow();
+      const td = (html) => { const x = r.insertCell(); x.innerHTML = html; return x; };
+      td('<span class="code">' + c.code + '</span>');
+      td(c.note ? esc(c.note) : '<span class="muted">—</span>');
+      td(c.plan);
+      td(c.days ? c.days + ' 天' : '永久');
+      td('<span class="tag t-' + c.status + '">' + (TAG[c.status] || c.status) + '</span>');
+      td(c.device_id ? '<span class="code">' + c.device_id.slice(0, 14) + '…</span>' : '<span class="muted">—</span>');
+      td(fmt(c.activated_at));
+      td(c.expires_at ? fmt(c.expires_at) : '永久');
+      td(c.uses ? (c.used + ' / ' + c.uses) : '<span class="muted">不限</span>');
+      const ops = r.insertCell();
+      const cp = el('button', 'mini', '复制'); cp.onclick = () => { navigator.clipboard.writeText(c.code); toast('已复制'); };
+      ops.appendChild(cp);
+      if (c.device_id) { const ub = el('button', 'mini', '解绑'); ub.style.marginLeft = '6px'; ub.onclick = () => act('unbind', c.code); ops.appendChild(ub); }
+      if (c.status !== 'revoked') { const rv = el('button', 'mini', '吊销'); rv.style.marginLeft = '6px'; rv.onclick = () => act('revoke', c.code); ops.appendChild(rv); }
+      const nt = el('button', 'mini', c.note ? '改备注' : '备注'); nt.style.marginLeft = '6px'; nt.onclick = () => actNote(c.code, c.note); ops.appendChild(nt);
+      const dl = el('button', 'mini danger', '删除'); dl.style.marginLeft = '6px'; dl.onclick = () => actDelete(c.code); ops.appendChild(dl);
+    });
+    const pages = Math.max(1, Math.ceil(j.total / j.size));
+    $('#pageInfo').textContent = '共 ' + j.total + ' 条 · 第 ' + j.page + '/' + pages + ' 页';
+  } catch (e) { toast(e.message, true); }
+}
+async function act(op, code) {
+  if (!confirm((op === 'revoke' ? '吊销' : '解绑') + '卡密 ' + code + '？')) return;
+  try { const j = await api('/api/admin/cards/' + encodeURIComponent(code) + '/' + op, {method:'POST', body:'{}'}); toast(j.message); loadCards(); loadStats(); }
+  catch (e) { toast(e.message, true); }
+}
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+
+async function actNote(code, current) {
+  const note = prompt('设置卡密备注（买家信息，如：淘宝订单号 / 微信号 / 昵称）\n卡密：' + code + '\n留空并确定 = 清空备注', current || '');
+  if (note === null) return;
+  try {
+    const j = await api('/api/admin/cards/' + encodeURIComponent(code) + '/note', { method: 'POST', body: JSON.stringify({ note: note.trim() }) });
+    toast(j.message); loadCards();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function actDelete(code) {
+  if (!confirm('删除卡密 ' + code + '？\n删除后不可恢复；若已绑定设备会一并解绑。')) return;
+  const typed = prompt('再次确认：请完整输入该卡密以执行删除');
+  if (typed === null) return;
+  if (typed.trim().toUpperCase() !== code) { toast('输入不一致，已取消', true); return; }
+  try {
+    const j = await api('/api/admin/cards/' + encodeURIComponent(code) + '/delete', { method: 'POST', body: JSON.stringify({ confirm: code }) });
+    toast(j.message); loadCards(); loadStats();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function loadBatchOptions() {
+  try {
+    const j = await api('/api/admin/cards?size=1');
+    const sel = $('#fBatch'); const cur = sel.value;
+    sel.innerHTML = '<option value="">全部</option>';
+    j.batches.forEach(b => { const o = el('option', '', b.batch + '（' + b.c + '）'); o.value = b.batch; sel.appendChild(o); });
+    sel.value = cur;
+  } catch {}
+}
+$('#fBtn').onclick = () => { page = 1; loadCards(); };
+$('#fStatus').onchange = () => { page = 1; loadCards(); };
+$('#fBatch').onchange = () => { page = 1; loadCards(); };
+$('#fQ').addEventListener('keydown', e => e.key === 'Enter' && (page = 1, loadCards()));
+$('#prevPage').onclick = () => { if (page > 1) { page--; loadCards(); } };
+$('#nextPage').onclick = () => { page++; loadCards(); };
+$('#expBtn').onclick = () => download('/api/admin/export' + ($('#fBatch').value ? '?batch=' + encodeURIComponent($('#fBatch').value) : ''), 'cards.csv');
+
+/* ---- 设备 ---- */
+async function loadDevices() {
+  try {
+    const j = await api('/api/admin/devices?page=' + devPage + '&size=20');
+    const t = $('#devTable'); t.innerHTML = '';
+    t.appendChild(el('tr')).innerHTML = ['设备号','名称','卡密','套餐','状态','IP','首次出现','最近心跳'].map(h => '<th>' + h + '</th>').join('');
+    if (!j.items.length) { const r = t.insertRow(); const c = r.insertCell(); c.colSpan = 8; c.className = 'muted'; c.textContent = '暂无数据'; }
+    j.items.forEach((d) => {
+      const r = t.insertRow();
+      const td = (html) => { const x = r.insertCell(); x.innerHTML = html; return x; };
+      td('<span class="code">' + d.device_id + '</span>');
+      td(d.name || '<span class="muted">—</span>');
+      td(d.card ? '<span class="code">' + d.card + '</span>' : '<span class="muted">—</span>');
+      td(d.plan || '<span class="muted">—</span>');
+      td(d.status ? '<span class="tag t-' + d.status + '">' + (TAG[d.status] || d.status) + '</span>' : '<span class="muted">—</span>');
+      td(d.ip || '<span class="muted">—</span>');
+      td(fmt(d.first_seen)); td(fmt(d.last_seen));
+    });
+    $('#devPageInfo').textContent = '共 ' + j.total + ' 台 · 第 ' + j.page + ' 页';
+  } catch (e) { toast(e.message, true); }
+}
+$('#devPrev').onclick = () => { if (devPage > 1) { devPage--; loadDevices(); } };
+$('#devNext').onclick = () => { devPage++; loadDevices(); };
+
+/* ---- tabs ---- */
+document.querySelectorAll('.tab').forEach(tb => {
+  tb.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === tb));
+    ['make','manage','devices'].forEach(k => $('#tab-' + k).classList.toggle('hide', k !== tb.dataset.tab));
+    if (tb.dataset.tab === 'manage') { loadCards(); loadBatchOptions(); }
+    if (tb.dataset.tab === 'devices') loadDevices();
+  };
+});
+
+function boot() { loadStats(); loadBatchOptions(); }
+if (TOKEN) {
+  api('/api/admin/stats').then(() => { $('#loginBox').classList.add('hide'); $('#app').classList.remove('hide'); boot(); })
+    .catch(() => { $('#loginBox').classList.remove('hide'); });
+}
+</script>
+</body>
+</html>

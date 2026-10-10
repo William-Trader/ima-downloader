@@ -1,0 +1,18 @@
+[Unit]
+Description=qc-license 卡密授权服务
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/qc-license
+Environment=PORT=8899
+Environment=DATA_DIR=/opt/qc-license/data
+ExecStart=/usr/local/bin/node /opt/qc-license/server.js
+Restart=always
+RestartSec=3
+StandardOutput=append:/var/log/qc-license.log
+StandardError=append:/var/log/qc-license.log
+
+[Install]
+WantedBy=multi-user.target
