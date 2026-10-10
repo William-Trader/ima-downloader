@@ -1,0 +1,20 @@
+# deps / build
+node_modules/
+.output/
+.wxt/
+dist/
+
+# data & secrets (never commit)
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+admin.password
+secret
+.env
+.env.*
+
+# os
+.DS_Store
+*.log

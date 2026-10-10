@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>激活会员 · ima 下载器</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #f6f8fc 0%, #eef1f8 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    width: 100%;
+    max-width: 520px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(17,24,39,0.14);
+    overflow: hidden;
+  }
+  .head {
+    padding: 28px 32px 22px;
+    border-bottom: 1px solid #eef1f6;
+    background: linear-gradient(135deg, #4f7cf7 0%, #22c3e6 100%);
+    color: #fff;
+  }
+  .head h1 { font-size: 22px; font-weight: 700; }
+  .head p { margin-top: 6px; font-size: 13px; opacity: 0.9; }
+  .body { padding: 24px 32px 28px; }
+  .label { font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 10px; }
+  .custom-row { display: flex; gap: 10px; align-items: center; }
+  .custom {
+    flex: 1;
+    height: 44px;
+    border: 1.5px solid #e5e9f2;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 15px;
+    letter-spacing: 1px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    outline: none;
+    color: #111827;
+    text-transform: uppercase;
+    transition: border-color .15s;
+  }
+  .custom:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; }
+  .btn {
+    flex: 1;
+    height: 46px;
+    border: 0;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn.ghost { background: #eef2fb; color: #3b62e0; }
+  .btn:hover { opacity: 0.9; }
+  .btn[disabled] { opacity: 0.55; cursor: default; }
+  .info { margin-top: 20px; border: 1px solid #eef1f6; border-radius: 12px; overflow: hidden; }
+  .row { display: flex; justify-content: space-between; padding: 11px 16px; font-size: 13px; border-bottom: 1px solid #f4f6fb; }
+  .row:last-child { border-bottom: 0; }
+  .row span { color: #6b7280; }
+  .row b { color: #111827; font-weight: 600; }
+  .result { margin-top: 14px; padding: 12px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; display: none; white-space: pre-line; }
+  .result.ok { display: block; background: #e3f8f0; color: #0d9f6e; border: 1px solid #b7ecd9; }
+  .result.err { display: block; background: #fdecec; color: #dc2626; border: 1px solid #f8c4c4; }
+  .foot { padding: 14px 32px; border-top: 1px solid #eef1f6; font-size: 11px; color: #9ca3af; text-align: center; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head">
+    <h1>💎 激活会员</h1>
+    <p>输入卡密激活 · 一卡一机 · 状态与清尘授权服务器实时同步</p>
+  </div>
+  <div class="body">
+    <div class="label">卡密</div>
+    <div class="custom-row">
+      <input class="custom" id="code" type="text" placeholder="QC-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="activate">激活</button>
+      <button class="btn ghost" id="refresh">查询状态</button>
+    </div>
+    <div class="result" id="result"></div>
+    <div class="info">
+      <div class="row"><span>授权状态</span><b id="f-active">查询中…</b></div>
+      <div class="row"><span>套餐</span><b id="f-plan">—</b></div>
+      <div class="row"><span>到期时间</span><b id="f-expires">—</b></div>
+      <div class="row"><span>剩余次数</span><b id="f-remaining">—</b></div>
+      <div class="row"><span>本机设备 ID</span><b id="f-device">—</b></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" id="deactivate">解绑本机授权</button>
+    </div>
+  </div>
+  <div class="foot">ima 下载器 · 授权服务 http://YOUR-LICENSE-HOST:8899 · qc-license v1</div>
+</div>
+<script src="./recharge.js"></script>
+</body>
+</html>

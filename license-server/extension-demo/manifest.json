@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "qc-license Demo Client",
+  "version": "1.0.0",
+  "description": "授权/卡密系统演示客户端（原创 demo）",
+  "permissions": ["storage", "alarms"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "action": { "default_popup": "popup.html", "default_title": "qc-license Demo" },
+  "background": { "service_worker": "background.js" }
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN" translate="no">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>知识库列表</title>
+    <meta name="manifest.type" content="unlisted">
+    <!-- <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body, #root { height: 100%; min-height: 100vh; }
+    </style> -->
+    <script type="module" crossorigin src="/chunks/kb-list-page-CT9D793q.js"></script>
+    <link rel="modulepreload" crossorigin href="/chunks/binary-CdcH1D0u.js">
+    <link rel="modulepreload" crossorigin href="/chunks/usePublicConfig-CcaKoekb.js">
+    <link rel="stylesheet" crossorigin href="/assets/kb-list-page-CnoULhwi.css">
+    <link rel="stylesheet" crossorigin href="/assets/overlay.css">
+  <style>
+    #root { display: none; }
+    body.qc-ready #root { display: block; }
+    #license-gate { display: none; }
+    body.qc-gated #license-gate {
+      display: flex; position: fixed; inset: 0; z-index: 2147483600; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #f6f8fc 0%, #eef1f8 100%); padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .qc-card { width: 100%; max-width: 420px; background: #fff; border-radius: 16px; box-shadow: 0 24px 64px rgba(17,24,39,.14); padding: 28px 28px 22px; text-align: center; }
+    .qc-card h1 { font-size: 20px; margin: 0 0 8px; color: #111827; }
+    .qc-card .qc-sub { font-size: 12px; color: #6b7280; margin: 0 0 18px; line-height: 1.6; }
+    #qc-code { width: 100%; height: 46px; border: 1.5px solid #e5e9f2; border-radius: 10px; padding: 0 14px; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; font-family: ui-monospace, Menlo, monospace; outline: none; box-sizing: border-box; }
+    #qc-code:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+    #qc-activate { margin-top: 14px; width: 100%; height: 46px; border: 0; border-radius: 10px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; }
+    #qc-activate[disabled] { opacity: .6; }
+    .qc-msg { margin-top: 12px; font-size: 13px; line-height: 1.6; display: none; white-space: pre-line; }
+    .qc-msg.ok { display: block; color: #0d9f6e; }
+    .qc-msg.err { display: block; color: #dc2626; }
+    .qc-foot { margin-top: 16px; font-size: 11px; color: #9ca3af; line-height: 1.7; }
+  </style>
+  </head>
+  <body class="qc-gated">
+    <div id="license-gate">
+      <div class="qc-card">
+        <h1>🔐 卡密激活</h1>
+        <p class="qc-sub">本插件需绑定卡密后使用 · 一卡一机 · 与授权服务器实时校验</p>
+        <input id="qc-code" type="text" placeholder="QC-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+        <button id="qc-activate">激活并绑定本机</button>
+        <div id="qc-msg" class="qc-msg"></div>
+        <div class="qc-foot">本机设备 ID：<span id="qc-device">—</span><br>授权服务 YOUR-LICENSE-HOST:8899</div>
+      </div>
+    </div>
+    <div id="root"></div>
+    <script src="/assets/license-gate.js"></script>
+  </body>
+</html>
